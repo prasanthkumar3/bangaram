@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Love Anniversary</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffebee;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            background-image: radial-gradient(#ffcdd2 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            perspective: 1000px;
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 320px;
+            height: 220px;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        .envelope-front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #e53935, #c62828);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: translateZ(1px);
+            z-index: 2;
+            transition: all 0.5s ease;
+        }
+
+        .envelope-front:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 110px solid #b71c1c;
+            transform-origin: top;
+            transform: rotateX(0deg);
+            transition: all 0.5s ease 0.2s;
+            z-index: 3;
+            filter: drop-shadow(0 -5px 5px rgba(0,0,0,0.1));
+        }
+
+        .envelope-open .envelope-front:before {
+            transform: rotateX(180deg);
+        }
+
+        .envelope-front:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-bottom: 110px solid #ef5350;
+            z-index: 1;
+        }
+
+        .envelope-seal {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, #ffeb3b, #fbc02d);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #e53935;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .envelope-seal:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .click-me {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            z-index: 2;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .envelope:hover .click-me {
+            opacity: 1;
+        }
+
+        .letter {
+            position: absolute;
+            width: 300px;
+            height: 200px;
+            background: linear-gradient(to bottom, #fff9c4, #fff);
+            top: 10px;
+            left: 10px;
+            border-radius: 5px;
+            padding: 20px;
+            box-sizing: border-box;
+            transform: translateY(0) scale(0.9);
+            opacity: 0;
+            transition: all 0.5s ease;
+            z-index: 1;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .letter:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 30px;
+            width: 2px;
+            height: 100%;
+            background: rgba(229, 57, 53, 0.1);
+        }
+
+        .envelope-open .letter {
+            opacity: 1;
+            transform: translateY(-100px) scale(1);
+            transition-delay: 0.3s;
+            z-index: 5;
+        }
+
+        .letter-content {
+            color: #333;
+            text-align: left;
+            line-height: 1.6;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .letter-content p:first-child {
+            margin-top: 0;
+        }
+
+        .heart {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0.7;
+            animation: float 6s ease-in-out infinite;
+            filter: drop-shadow(0 0 5px rgba(229, 57, 53, 0.5));
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-30px) rotate(10deg);
+            }
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+
+        .popup-content {
+            background: linear-gradient(135deg, #fff, #f5f5f5);
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: fadeIn 0.5s;
+            border: 1px solid #ffcdd2;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #e53935;
+            transition: transform 0.3s ease;
+        }
+
+        .close-btn:hover {
+            transform: rotate(90deg);
+        }
+
+        .popup-content h2 {
+            color: #c62828;
+            text-align: center;
+            margin-bottom: 20px;
+            font-family: 'Brush Script MT', cursive;
+            font-size: 32px;
+        }
+
+        .popup-content p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .signature {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 24px;
+            color: #c62828;
+            text-align: right;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="envelope-wrapper" id="envelopeWrapper">
+            <div class="envelope" id="envelope">
+                <div class="envelope-front">
+                    <div class="click-me">Click the Seal</div>
+                </div>
+                <div class="envelope-seal" id="envelopeSeal">❤️</div>
+                <div class="letter">
+                    <div class="letter-content">
+                        <p>My Dearest Love,</p>
+                        <p>Happy Anniversary! This envelope contains just a small token of my love for you. Click the seal to read what's truly in my heart...</p>
+                        <p>With love,</p>
+                        <p>❤️</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-content">
+            <span class="close-btn" id="closeBtn">&times;</span>
+            <h2>Happy Anniversary My Love!</h2>
+            <p>My Dearest,</p>
+            <p>As I sit here thinking about our journey together, my heart overflows with gratitude for every moment we've shared. You've brought more joy into my life than I ever thought possible.</p>
+            <p>Remember our first date? I knew then there was something special about you. And now, after all this time, that feeling has only grown stronger with each passing day.</p>
+            <p>Your smile brightens my darkest days, your laughter is my favorite melody, and your love is the greatest gift I've ever received. I cherish the way you understand me without words, support me without hesitation, and love me without conditions.</p>
+            <p>Today, on our anniversary, I want to renew my promise to you - to be your partner in every adventure, your comfort in every storm, and your biggest fan in every endeavor. I will love you more tomorrow than I do today, but never as much as I will the day after.</p>
+            <p>Thank you for choosing me, for loving me, and for building this beautiful life with me. Here's to many more years of love, laughter, and shared dreams.</p>
+            <div class="signature">Forever Yours</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const envelope = document.getElementById('envelope');
+            const envelopeSeal = document.getElementById('envelopeSeal');
+            const envelopeWrapper = document.getElementById('envelopeWrapper');
+            const popupOverlay = document.getElementById('popupOverlay');
+            const closeBtn = document.getElementById('closeBtn');
+            
+            // Create floating hearts with different colors
+            function createHearts() {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤️';
+                heart.classList.add('heart');
+                
+                // Random position
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.top = Math.random() * 100 + 'vh';
+                
+                // Random size
+                const size = Math.random() * 25 + 15;
+                heart.style.fontSize = size + 'px';
+                
+                // Random animation duration and delay
+                heart.style.animationDuration = Math.random() * 4 + 3 + 's';
+                heart.style.animationDelay = Math.random() * 2 + 's';
+                
+                // Random color variation
+                const colors = ['#e53935', '#c2185b', '#f44336', '#d81b60'];
+                heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+                
+                document.body.appendChild(heart);
+                
+                // Remove heart after animation completes
+                setTimeout(() => {
+                    heart.remove();
+                }, 7000);
+            }
+            
+            // Create hearts periodically
+            setInterval(createHearts, 200);
+            
+            // Envelope seal click event
+            envelopeSeal.addEventListener('click', function(e) {
+                e.stopPropagation();
+                envelope.classList.toggle('envelope-open');
+                envelopeWrapper.style.transform = 'translateZ(100px)';
+                
+                // Show popup after a short delay
+                setTimeout(() => {
+                    popupOverlay.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                }, 1000);
+            });
+            
+            // Envelope click event (fallback)
+            envelope.addEventListener('click', function() {
+                if (!envelope.classList.contains('envelope-open')) {
+                    this.classList.toggle('envelope-open');
+                    envelopeWrapper.style.transform = 'translateZ(100px)';
+                    
+                    setTimeout(() => {
+                        popupOverlay.style.display = 'flex';
+                        document.body.style.overflow = 'hidden';
+                    }, 1000);
+                }
+            });
+            
+            // Close popup events
+            closeBtn.addEventListener('click', closePopup);
+            
+            popupOverlay.addEventListener('click', function(e) {
+                if (e.target === popupOverlay) {
+                    closePopup();
+                }
+            });
+            
+            function closePopup() {
+                popupOverlay.style.display = 'none';
+                envelope.classList.remove('envelope-open');
+                envelopeWrapper.style.transform = 'translateZ(0)';
+                document.body.style.overflow = 'auto';
+            }
+            
+            // Add subtle hover effect to envelope
+            envelopeWrapper.addEventListener('mousemove', function(e) {
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+                if (!envelope.classList.contains('envelope-open')) {
+                    envelopeWrapper.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+                }
+            });
+            
+            envelopeWrapper.addEventListener('mouseenter', function() {
+                if (!envelope.classList.contains('envelope-open')) {
+                    envelopeWrapper.style.transition = 'all 0.1s ease';
+                }
+            });
+            
+            envelopeWrapper.addEventListener('mouseleave', function() {
+                if (!envelope.classList.contains('envelope-open')) {
+                    envelopeWrapper.style.transition = 'all 0.5s ease';
+                    envelopeWrapper.style.transform = 'rotateY(0deg) rotateX(0deg)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
